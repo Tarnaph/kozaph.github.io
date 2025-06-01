@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Interativa - Lojas Renner (LREN3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+        .nav-link.active {
+            color: #1e293b; /* slate-800 */
+            border-bottom-color: #1e293b;
+        }
+        .tab-button.active {
+            background-color: #1e293b; /* slate-800 */
+            color: #ffffff;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-700 antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-slate-800">Análise LREN3</h1>
+                    <span class="ml-3 text-sm font-medium text-slate-500 hidden sm:block">Lojas Renner S.A.</span>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#overview" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Visão Geral</a>
+                    <a href="#financials" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Análise Financeira</a>
+                    <a href="#history" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Desempenho</a>
+                    <a href="#risks" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Riscos</a>
+                    <a href="#peers" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Comparativo</a>
+                    <a href="#conclusion" class="nav-link text-slate-500 font-medium border-b-2 border-transparent hover:text-slate-800">Conclusão</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="overview" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Visão Geral da LREN3</h2>
+            <p class="text-lg text-slate-600 mb-8">Um resumo interativo dos principais indicadores, pontos fortes e fracos da Lojas Renner, com base na análise de Maio de 2025.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-slate-800 text-xl mb-4">Pontuação Geral</h3>
+                        <div class="relative w-48 h-48 mx-auto">
+                            <canvas id="scoreChart"></canvas>
+                            <div id="scoreText" class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-slate-800"></div>
+                        </div>
+                         <p class="text-center text-slate-500 mt-4">Desempenho bom, com excelência financeira mas desafios no crescimento de lucros.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-slate-800 text-xl mb-4">Indicadores Chave</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between"><span>Preço Atual (30/05/25):</span> <span class="font-semibold text-slate-800">R$ 18.16</span></div>
+                            <div class="flex justify-between"><span>P/L:</span> <span class="font-semibold text-slate-800">15.08</span></div>
+                            <div class="flex justify-between"><span>PEG Ratio:</span> <span class="font-semibold text-green-600">0.77</span></div>
+                            <div class="flex justify-between"><span>Dividend Yield:</span> <span class="font-semibold text-slate-800">3.75%</span></div>
+                            <div class="flex justify-between"><span>ROE:</span> <span class="font-semibold text-slate-800">12.45%</span></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-2 bg-white p-8 rounded-xl shadow-md">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-xl text-green-700 mb-4">Pontos Fortes</h3>
+                            <ul class="space-y-4 text-slate-600">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-3 mt-1">✔</span>
+                                    <div><strong class="text-slate-700">Saúde Financeira Excepcional:</strong> Posição de dívida líquida negativa e alta liquidez, conferindo resiliência em cenários de juros altos.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-3 mt-1">✔</span>
+                                    <div><strong class="text-slate-700">Margens Operacionais Robustas:</strong> Gestão eficaz de custos e bom poder de precificação refletidos nas margens Bruta e EBITDA.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 mr-3 mt-1">✔</span>
+                                    <div><strong class="text-slate-700">Geração de Caixa Positiva:</strong> Transição para Fluxo de Caixa Livre (FCL) positivo, indicando melhoria na capacidade de gerar caixa operacionalmente.</div>
+                                </li>
+                                 <li class="flex items-start">
+                                    <span class="text-green-500 mr-3 mt-1">✔</span>
+                                    <div><strong class="text-slate-700">Potencial de Valorização:</strong> PEG Ratio abaixo de 1.0 sugere que a ação pode estar subavaliada em relação ao crescimento esperado de lucros.</div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xl text-red-700 mb-4">Pontos Fracos</h3>
+                            <ul class="space-y-4 text-slate-600">
+                                <li class="flex items-start">
+                                    <span class="text-red-500 mr-3 mt-1">✖</span>
+                                    <div><strong class="text-slate-700">Desafio na Conversão de Lucro:</strong> Crescimento dos lucros significativamente inferior ao da receita, apontando para pressões sobre as margens.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-red-500 mr-3 mt-1">✖</span>
+                                    <div><strong class="text-slate-700">Cenário Macroeconômico Adverso:</strong> Juros altos, aumento de IOF e desaceleração do PIB impactam o consumo e os custos operacionais.</div>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-red-500 mr-3 mt-1">✖</span>
+                                    <div><strong class="text-slate-700">Perda de Market Share:</strong> Indícios de perda de participação para concorrentes diretos, sinalizando desafios competitivos.</div>
+                                </li>
+                                 <li class="flex items-start">
+                                    <span class="text-red-500 mr-3 mt-1">✖</span>
+                                    <div><strong class="text-slate-700">Consenso de Mercado Cauteloso:</strong> Preço-alvo médio de analistas ligeiramente abaixo do preço atual, sugerindo otimismo já precificado.</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="financials" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Análise Financeira Detalhada</h2>
+             <p class="text-lg text-slate-600 mb-8">Explore os indicadores financeiros da LREN3 por categoria. Clique nas abas para navegar pelos diferentes conjuntos de métricas.</p>
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="mb-6 border-b border-slate-200">
+                    <nav class="-mb-px flex space-x-4" id="financials-tabs">
+                        <button data-tab="valuation" class="tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">Valuation</button>
+                        <button data-tab="endividamento" class="tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">Endividamento</button>
+                        <button data-tab="eficiencia" class="tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">Eficiência</button>
+                        <button data-tab="rentabilidade" class="tab-button whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300">Rentabilidade</button>
+                    </nav>
+                </div>
+                <div id="financials-content">
+                </div>
+            </div>
+        </section>
+
+        <section id="history" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Desempenho Histórico</h2>
+            <p class="text-lg text-slate-600 mb-8">Visualize a evolução financeira da Lojas Renner nos últimos cinco anos. Use os botões para alternar entre receita, lucro e fluxo de caixa livre.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                 <div class="flex justify-center space-x-2 mb-6">
+                    <button id="btn-receita" class="tab-button py-2 px-4 rounded-lg text-sm font-medium">Receita Total</button>
+                    <button id="btn-lucro" class="tab-button py-2 px-4 rounded-lg text-sm font-medium">Lucro Líquido</button>
+                    <button id="btn-fcl" class="tab-button py-2 px-4 rounded-lg text-sm font-medium">FCL Alavancado</button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="historicalChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Análise de Riscos</h2>
+            <p class="text-lg text-slate-600 mb-8">Compreenda os principais riscos financeiros, operacionais e de mercado que podem impactar o desempenho da LREN3.</p>
+            <div class="space-y-4">
+                <div class="accordion-item bg-white rounded-xl shadow-md">
+                    <button class="accordion-header w-full flex justify-between items-center p-6 text-left font-semibold text-slate-800 text-lg">
+                        <span>Riscos de Rentabilidade e Crescimento de Lucros</span>
+                        <span class="accordion-icon transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600">
+                            <p>A principal preocupação reside na dificuldade em traduzir o crescimento robusto da receita em um crescimento proporcional do lucro líquido. O CAGR de Receitas de 5 anos (8.53%) supera em muito o CAGR de Lucros (3.07%), apontando para uma possível erosão da qualidade dos lucros. Isso pode indicar intensificação da concorrência, aumento de custos operacionais (SG&A) para sustentar as vendas, ou pressão sobre o Custo dos Produtos Vendidos (CPV), significando que o crescimento do faturamento não está se convertendo em valor para o acionista de forma eficiente.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-xl shadow-md">
+                    <button class="accordion-header w-full flex justify-between items-center p-6 text-left font-semibold text-slate-800 text-lg">
+                        <span>Riscos Macroeconômicos e Setoriais</span>
+                         <span class="accordion-icon transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600">
+                           <p>O ambiente macroeconômico brasileiro apresenta desafios significativos. A taxa Selic elevada (14.75%) impacta o poder de compra e o custo de capital. O aumento do IOF, que pode elevar em até 39% o custo do capital de giro, representa um risco direto. A desaceleração do PIB e os riscos fiscais elevados geram incerteza, afetando a confiança do consumidor e do investidor, o que pode corroer as margens e o crescimento da LREN3, mesmo com sua forte posição de caixa.</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-white rounded-xl shadow-md">
+                    <button class="accordion-header w-full flex justify-between items-center p-6 text-left font-semibold text-slate-800 text-lg">
+                        <span>Riscos Competitivos</span>
+                        <span class="accordion-icon transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="accordion-content">
+                        <div class="p-6 pt-0 text-slate-600">
+                           <p>Análises de mercado apontam que a Lojas Renner está perdendo participação de mercado para concorrentes como C&A e Riachuelo. Esta perda de market share é um risco de longo prazo que pode minar a vantagem competitiva da empresa. Sugere dificuldades em se adaptar às mudanças nas preferências do consumidor ou às estratégias agressivas dos concorrentes. A reestruturação organizacional anunciada é uma resposta a esse desafio, mas sua eficácia ainda precisa ser comprovada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="peers" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Comparativo com Pares</h2>
+            <p class="text-lg text-slate-600 mb-8">Compare a LREN3 com seus principais concorrentes, C&A (CEAB3) e Riachuelo (GUAR3), em indicadores chave. Selecione uma métrica para atualizar o gráfico.</p>
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                 <div class="flex justify-center mb-6">
+                    <select id="peer-metric-selector" class="block w-full max-w-xs p-2 border border-slate-300 rounded-md shadow-sm focus:ring-slate-500 focus:border-slate-500">
+                        <option value="p/l" selected>P/L</option>
+                        <option value="p/vp">P/VP</option>
+                        <option value="debt/equity">Dívida/PL</option>
+                        <option value="roe">ROE</option>
+                        <option value="margem_liquida">Margem Líquida</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="peerChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Conclusão e Projeções</h2>
+            <p class="text-lg text-slate-600 mb-8">Análise final, recomendação de investimento e cenários de preço para o próximo mês.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-8">
+                     <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-slate-800 text-xl mb-4">Projeção de Preço (Próximo Mês)</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="border border-green-200 bg-green-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-green-800">Cenário Otimista: R$ 19.50 - R$ 20.50</h4>
+                                <p class="text-sm text-green-700 mt-2">Impulsionado por sucesso na reestruturação, resiliência do consumo e percepção de subavaliação (PEG Ratio).</p>
+                            </div>
+                             <div class="border border-red-200 bg-red-50 p-4 rounded-lg">
+                                <h4 class="font-semibold text-red-800">Cenário Pessimista: R$ 16.00 - R$ 17.00</h4>
+                                <p class="text-sm text-red-700 mt-2">Materialização de riscos como persistência da baixa conversão de lucro, piora macroeconômica e intensificação da concorrência.</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="font-bold text-slate-800 text-xl mb-4">Consenso de Analistas</h3>
+                        <div class="flex items-center justify-around text-center">
+                            <div>
+                                <div class="text-3xl font-bold text-slate-800">R$ 17.60</div>
+                                <div class="text-sm text-slate-500">Preço-Alvo Médio (12m)</div>
+                            </div>
+                            <div>
+                                <div class="text-3xl font-bold text-green-600">10</div>
+                                <div class="text-sm text-slate-500">Recomendam Compra</div>
+                            </div>
+                             <div>
+                                <div class="text-3xl font-bold text-amber-600">5</div>
+                                <div class="text-sm text-slate-500">Recomendam Manter</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 text-center mt-4">Fonte: Consenso de 15 analistas via Investing.com</p>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1 bg-slate-800 text-white p-8 rounded-xl shadow-lg flex flex-col justify-center items-center text-center">
+                    <h3 class="font-bold text-2xl mb-4">Recomendação Final</h3>
+                    <div class="text-6xl font-extrabold text-amber-400 mb-4">MANTER</div>
+                    <p class="text-slate-300">A robusta saúde financeira e a reestruturação são positivas, mas os desafios na conversão de lucro e o cenário macroeconômico adverso exigem cautela. Para novos investidores, é prudente aguardar sinais mais claros de recuperação da lucratividade antes de iniciar uma posição.</p>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center text-xs text-slate-400">
+                <p><strong>Disclaimer:</strong> Esta análise é meramente informativa e não deve ser interpretada como uma recomendação de compra ou venda de ações. O investidor deve realizar sua própria pesquisa e considerar seu perfil de risco antes de tomar decisões de investimento. Análise baseada em dados públicos de Maio de 2025.</p>
+            </div>
+        </section>
+
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // Data Store
+            const financialData = {
+                valuation: [
+                    { label: "P/L", value: 15.08, note: "Preço/Lucro" },
+                    { label: "PEG Ratio", value: 0.77, note: "P/L sobre crescimento esperado" },
+                    { label: "P/VP", value: 1.88, note: "Preço/Valor Patrimonial" },
+                    { label: "EV/EBITDA", value: 6.67, note: "Valor da Firma/EBITDA" },
+                    { label: "P/SR", value: 1.30, note: "Preço/Receita Líquida" },
+                    { label: "Dividend Yield", value: "3.75%", note: "Rendimento de Dividendos" },
+                ],
+                endividamento: [
+                    { label: "Dív. Líquida/EBITDA", value: -0.45, note: "Dívida negativa indica caixa líquido" },
+                    { label: "Liq. Corrente", value: 1.67, note: "Capacidade de pagar dívidas de curto prazo" },
+                    { label: "PL/Ativos", value: 0.56, note: "Patrimônio sobre total de ativos" },
+                    { label: "Passivos/Ativos", value: 0.44, note: "Total de passivos sobre ativos" },
+                ],
+                eficiencia: [
+                    { label: "Margem Bruta", value: "60.83%", note: "Lucratividade sobre custo dos produtos" },
+                    { label: "Margem EBITDA", value: "18.33%", note: "Lucro operacional antes de juros, etc." },
+                    { label: "Margem EBIT", value: "9.85%", note: "Lucro operacional" },
+                    { label: "Margem Líquida", value: "8.65%", note: "Lucro final sobre receita" },
+                ],
+                rentabilidade: [
+                    { label: "ROE", value: "12.45%", note: "Retorno sobre Patrimônio Líquido" },
+                    { label: "ROA", value: "6.93%", note: "Retorno sobre Ativos" },
+                    { label: "ROIC", value: "11.89%", note: "Retorno sobre Capital Investido" },
+                    { label: "Giro Ativos", value: 0.80, note: "Eficiência no uso de ativos para gerar receita" },
+                ]
+            };
+
+            const historicalData = {
+                labels: ['2020', '2021', '2022', '2023', '2024'],
+                receita: [7537.18, 10571.57, 13271.14, 13647.85, 14436.37],
+                lucro: [1096.27, 633.11, 1291.70, 976.26, 1196.67],
+                fcl: [-444.43, -27.36, -573.63, 1188.17, 1104.27]
+            };
+
+            const peerData = {
+                labels: ['LREN3', 'CEAB3', 'GUAR3'],
+                'p/l': [15.08, 7.56, 17.22],
+                'p/vp': [1.88, 1.02, 0.75],
+                'debt/equity': [29.14, 100.5, 58.0],
+                'roe': [12.45, 14.37, 6.2],
+                'margem_liquida': [8.65, null, 3.31] 
+            };
+            
+            // 1. Score Chart
+            const score = 3.80;
+            const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+            document.getElementById('scoreText').innerText = score.toFixed(2);
+            new Chart(scoreCtx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [score, 5 - score],
+                        backgroundColor: ['#1e293b', '#e2e8f0'],
+                        borderColor: ['#1e293b', '#e2e8f0'],
+                        borderWidth: 1,
+                        circumference: 270,
+                        rotation: 225,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '80%',
+                    plugins: {
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            // 2. Financials Tabs
+            const tabsContainer = document.getElementById('financials-tabs');
+            const contentContainer = document.getElementById('financials-content');
+
+            function renderFinancials(tab) {
+                const data = financialData[tab];
+                let html = '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
+                data.forEach(item => {
+                    html += `
+                        <div class="bg-slate-50 p-4 rounded-lg">
+                            <div class="flex justify-between items-baseline">
+                                <span class="font-semibold text-slate-800">${item.label}</span>
+                                <span class="text-2xl font-bold text-slate-900">${item.value}</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-1">${item.note}</p>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                contentContainer.innerHTML = html;
+            }
+
+            tabsContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const tabName = e.target.dataset.tab;
+                    tabsContainer.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderFinancials(tabName);
+                }
+            });
+            tabsContainer.querySelector('button').click();
+
+            // 3. Historical Chart
+            const historicalCtx = document.getElementById('historicalChart').getContext('2d');
+            let historicalChart = new Chart(historicalCtx, {
+                type: 'bar',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value, index, values) {
+                                    return value.toLocaleString('pt-BR') + ' M';
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += 'R$ ' + context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' M';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateHistoricalChart(dataType) {
+                document.getElementById('btn-receita').classList.remove('active');
+                document.getElementById('btn-lucro').classList.remove('active');
+                document.getElementById('btn-fcl').classList.remove('active');
+                document.getElementById(`btn-${dataType}`).classList.add('active');
+
+                let data, label, backgroundColor;
+                if (dataType === 'receita') {
+                    data = historicalData.receita;
+                    label = 'Receita Total (Milhões BRL)';
+                    backgroundColor = 'rgba(59, 130, 246, 0.7)';
+                } else if (dataType === 'lucro') {
+                    data = historicalData.lucro;
+                    label = 'Lucro Líquido (Milhões BRL)';
+                    backgroundColor = 'rgba(22, 163, 74, 0.7)';
+                } else {
+                    data = historicalData.fcl;
+                    label = 'FCL Alavancado (Milhões BRL)';
+                    backgroundColor = 'rgba(147, 51, 234, 0.7)';
+                }
+
+                historicalChart.data = {
+                    labels: historicalData.labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: backgroundColor,
+                        borderColor: backgroundColor.replace('0.7', '1'),
+                        borderWidth: 1
+                    }]
+                };
+                historicalChart.update();
+            }
+            document.getElementById('btn-receita').addEventListener('click', () => updateHistoricalChart('receita'));
+            document.getElementById('btn-lucro').addEventListener('click', () => updateHistoricalChart('lucro'));
+            document.getElementById('btn-fcl').addEventListener('click', () => updateHistoricalChart('fcl'));
+            updateHistoricalChart('receita');
+
+
+            // 4. Accordions for Risks
+            const accordions = document.querySelectorAll('.accordion-item');
+            accordions.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight;
+                    if (isOpen) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // 5. Peer Comparison Chart
+            const peerCtx = document.getElementById('peerChart').getContext('2d');
+            let peerChart = new Chart(peerCtx, {
+                type: 'bar',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false }
+                    },
+                     scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            function updatePeerChart(metric) {
+                const data = peerData[metric];
+                let label = '';
+                switch(metric) {
+                    case 'p/l': label = 'P/L Ratio'; break;
+                    case 'p/vp': label = 'P/VP Ratio'; break;
+                    case 'debt/equity': label = 'Dívida/PL (%)'; break;
+                    case 'roe': label = 'ROE (%)'; break;
+                    case 'margem_liquida': label = 'Margem Líquida (%)'; break;
+                }
+                
+                peerChart.data = {
+                    labels: peerData.labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: [
+                            'rgba(30, 41, 59, 0.8)', // slate-800
+                            'rgba(100, 116, 139, 0.8)', // slate-500
+                            'rgba(148, 163, 184, 0.8)', // slate-400
+                        ],
+                        borderColor: [
+                           '#0f172a',
+                           '#475569',
+                           '#64748b'
+                        ],
+                        borderWidth: 1
+                    }]
+                };
+                peerChart.options.plugins.tooltip = {
+                    callbacks: {
+                        label: function(context) {
+                            let val = context.parsed.x;
+                            if (metric === 'debt/equity' || metric === 'roe' || metric === 'margem_liquida') {
+                                return val.toFixed(2) + '%';
+                            }
+                            return val.toFixed(2);
+                        }
+                    }
+                };
+                peerChart.update();
+            }
+
+            document.getElementById('peer-metric-selector').addEventListener('change', (e) => {
+                updatePeerChart(e.target.value);
+            });
+            updatePeerChart('p/l');
+            
+            // 6. Smooth scroll and active nav link
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+
+        });
+    </script>
+</body>
+</html>
