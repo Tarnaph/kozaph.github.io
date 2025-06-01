@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Interativa - Fleury (FLRY3)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4; 
+            color: #404040;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0d9488; 
+            border-bottom-color: #0d9488;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .tab-button {
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background-color: #0d9488;
+            color: #ffffff;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .score-badge {
+            background-color: #0d9488;
+            color: white;
+        }
+        .risk-accordion-header {
+            cursor: pointer;
+        }
+        .risk-accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .risk-accordion-content.open {
+            max-height: 1000px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800">Análise Interativa: <span class="text-teal-600">FLRY3</span></h1>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#overview" class="nav-link font-medium pb-1">Visão Geral</a>
+                    <a href="#indicators" class="nav-link font-medium pb-1">Indicadores</a>
+                    <a href="#comparison" class="nav-link font-medium pb-1">Comparativo</a>
+                    <a href="#projections" class="nav-link font-medium pb-1">Projeções e Riscos</a>
+                    <a href="#recommendations" class="nav-link font-medium pb-1">Recomendações</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        
+        <section id="overview" class="mb-16 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Visão Geral da Fleury S.A.</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Uma síntese da saúde financeira da empresa, destacando a pontuação geral, indicadores chave e uma análise de seus pontos fortes e fracos para uma avaliação rápida.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                <div class="lg:col-span-1 flex flex-col items-center justify-center card p-6">
+                    <p class="text-lg font-semibold text-gray-600 mb-2">Pontuação Geral</p>
+                    <div class="text-7xl font-bold text-teal-600">4.25<span class="text-4xl text-gray-400">/5</span></div>
+                    <p class="mt-4 text-center text-gray-500">Reflete um desempenho financeiro forte e equilibrado em todas as categorias analisadas.</p>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+                        <div class="bg-teal-600 h-2.5 rounded-full" style="width: 85%"></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">P/L</p>
+                        <p class="text-2xl font-bold text-gray-800">11.11</p>
+                    </div>
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">PEG Ratio</p>
+                        <p class="text-2xl font-bold text-teal-600">0.43</p>
+                    </div>
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">Dividend Yield</p>
+                        <p class="text-2xl font-bold text-gray-800">7.99%</p>
+                    </div>
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">Dív. Líq./EBITDA</p>
+                        <p class="text-2xl font-bold text-gray-800">1.51</p>
+                    </div>
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">CAGR Receitas 5A</p>
+                        <p class="text-2xl font-bold text-gray-800">21.48%</p>
+                    </div>
+                    <div class="card p-4 flex flex-col justify-center text-center">
+                        <p class="text-sm font-medium text-gray-500">ROIC</p>
+                        <p class="text-2xl font-bold text-gray-800">9.39%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-green-600 mb-4">Pontos Fortes</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span><strong>Crescimento Robusto:</strong> CAGRs excepcionais de receita e lucro nos últimos 5 anos.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span><strong>Valuation Atraente:</strong> PEG Ratio baixo (0.43) sugere "crescimento a preço razoável".</span></li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span><strong>Saúde Financeira:</strong> Alta liquidez (2.29) e dívida gerenciável.</span></li>
+                        <li class="flex items-start"><span class="text-green-500 mr-2">✓</span><span><strong>Eficiência e Rentabilidade:</strong> Margens consistentes e ROIC sólido de 9.39%.</span></li>
+                    </ul>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-red-600 mb-4">Pontos Fracos</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong>Capital de Giro:</strong> P/Ativo Circ. Líquido negativo (-0.81) requer atenção.</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong>Sensibilidade Macro:</strong> Vulnerável a altas taxas de juros e inflação no Brasil.</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong>Negócio Intensivo em Capital:</strong> Baixo giro de ativos (0.59) é típico, mas limita o fluxo de caixa.</span></li>
+                        <li class="flex items-start"><span class="text-red-500 mr-2">✗</span><span><strong>Riscos de Integração:</strong> Aquisições contínuas trazem desafios operacionais.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="indicators" class="mb-16 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Análise de Indicadores</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Explore a performance financeira da Fleury através de cinco categorias chave. O gráfico de radar oferece uma visão consolidada do perfil da empresa, enquanto as abas fornecem os dados detalhados de cada indicador.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-2 card p-6">
+                    <h3 class="text-xl font-semibold text-center mb-4">Perfil Financeiro (Pontuação)</h3>
+                    <div class="chart-container mx-auto h-[300px] md:h-[400px]">
+                        <canvas id="indicatorRadarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 card p-6">
+                    <div class="mb-6 border-b border-gray-200">
+                        <div class="flex flex-wrap -mb-px" id="indicatorTabs">
+                            <button class="tab-button active text-sm md:text-base mr-2 inline-block p-3 md:p-4 border-b-2 border-transparent rounded-t-lg font-semibold" data-tab="valuation">Valuation</button>
+                            <button class="tab-button text-sm md:text-base mr-2 inline-block p-3 md:p-4 border-b-2 border-transparent rounded-t-lg font-semibold" data-tab="endividamento">Endividamento</button>
+                            <button class="tab-button text-sm md:text-base mr-2 inline-block p-3 md:p-4 border-b-2 border-transparent rounded-t-lg font-semibold" data-tab="eficiencia">Eficiência</button>
+                            <button class="tab-button text-sm md:text-base mr-2 inline-block p-3 md:p-4 border-b-2 border-transparent rounded-t-lg font-semibold" data-tab="rentabilidade">Rentabilidade</button>
+                            <button class="tab-button text-sm md:text-base mr-2 inline-block p-3 md:p-4 border-b-2 border-transparent rounded-t-lg font-semibold" data-tab="crescimento">Crescimento</button>
+                        </div>
+                    </div>
+                    <div id="indicatorContent" class="overflow-x-auto">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="mb-16 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Comparativo Setorial</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Compare o desempenho da Fleury com seus principais concorrentes. Selecione um indicador para visualizar como a FLRY3 se posiciona em relação a DASA3, HAPV3 e RDOR3.</p>
+            </div>
+            <div class="card p-6 md:p-8">
+                <div class="flex justify-center flex-wrap gap-2 mb-6" id="comparisonButtons">
+                    <button class="comparison-btn bg-teal-500 text-white py-2 px-4 rounded-full text-sm font-semibold" data-metric="P/L">P/L</button>
+                    <button class="comparison-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-full text-sm font-semibold" data-metric="EV/EBITDA">EV/EBITDA</button>
+                    <button class="comparison-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-full text-sm font-semibold" data-metric="Margem Líquida">Margem Líquida</button>
+                    <button class="comparison-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-full text-sm font-semibold" data-metric="ROE">ROE</button>
+                    <button class="comparison-btn bg-gray-200 text-gray-700 py-2 px-4 rounded-full text-sm font-semibold" data-metric="Dívida Líquida/EBITDA">Dív.Líq./EBITDA</button>
+                </div>
+                <div class="chart-container mx-auto">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+                 <div id="comparisonAnalysis" class="mt-6 text-center text-gray-600 max-w-2xl mx-auto"></div>
+            </div>
+        </section>
+        
+        <section id="projections" class="mb-16 scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Projeções de Preço e Análise de Riscos</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Explore os possíveis cenários futuros para o preço da ação e os principais riscos que podem impactar o desempenho da Fleury.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Projeção de Preço (Próximo Mês)</h3>
+                    <p class="text-sm text-gray-500 mb-6">Baseado no preço atual de R$12.90 e na análise de cenários.</p>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-base font-medium text-green-700">Cenário Otimista</span>
+                                <span class="text-sm font-medium text-green-700">R$13.50 - R$14.50</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-gradient-to-r from-green-300 to-green-500 h-4 rounded-full" style="width: 100%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Potencial de +4.65% a +12.40%</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-base font-medium text-blue-700">Preço Atual</span>
+                                <span class="text-sm font-medium text-blue-700">R$12.90</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-blue-500 h-4 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-base font-medium text-red-700">Cenário Pessimista</span>
+                                <span class="text-sm font-medium text-red-700">R$11.50 - R$12.50</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-4">
+                                <div class="bg-gradient-to-r from-red-500 to-red-300 h-4 rounded-full" style="width: 100%"></div>
+                            </div>
+                             <p class="text-xs text-gray-500 mt-1">Potencial de -10.85% a -3.10%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-6">
+                     <h3 class="text-xl font-bold text-gray-800 mb-4">Principais Riscos</h3>
+                    <div id="riskAccordion" class="space-y-2">
+                        <div>
+                            <div class="risk-accordion-header flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                                <h4 class="font-semibold">Riscos Intrínsecos</h4>
+                                <span class="text-xl transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="risk-accordion-content px-3 pt-2 pb-3">
+                                <p class="text-gray-600">O P/Ativo Circ. Liq. negativo (-0.81) pode indicar dependência de financiamento de curto prazo. A alavancagem de 60% dos ativos via passivos cria sensibilidade a juros.</p>
+                            </div>
+                        </div>
+                        <div>
+                           <div class="risk-accordion-header flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                                <h4 class="font-semibold">Riscos Operacionais e Setoriais</h4>
+                                <span class="text-xl transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="risk-accordion-content px-3 pt-2 pb-3">
+                                <p class="text-gray-600">Concorrência intensa, riscos de integração de aquisições, rápida evolução tecnológica e mudanças regulatórias no setor de saúde são pontos de atenção.</p>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="risk-accordion-header flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                                <h4 class="font-semibold">Riscos Macroeconômicos</h4>
+                                 <span class="text-xl transform transition-transform duration-300">▼</span>
+                            </div>
+                            <div class="risk-accordion-content px-3 pt-2 pb-3">
+                                <p class="text-gray-600">As altas taxas de juros (SELIC) e pressões inflacionárias no Brasil podem aumentar custos e comprimir margens. Uma desaceleração econômica pode afetar a demanda.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="recommendations" class="scroll-mt-24">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Consenso de Mercado</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Veja o que os analistas de mercado pensam sobre a FLRY3. A seção combina a distribuição das recomendações com uma lista de preços-alvo de diversas instituições financeiras.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="card p-6">
+                     <h3 class="text-xl font-semibold text-center mb-4">Recomendações de Analistas</h3>
+                    <div class="chart-container mx-auto h-[250px] md:h-[300px]">
+                        <canvas id="recommendationsChart"></canvas>
+                    </div>
+                     <p class="text-center mt-4 text-gray-600">Consenso majoritariamente otimista, indicando potencial de valorização.</p>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold text-center mb-4">Preços-Alvo</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3">Instituição/Fonte</th>
+                                    <th class="px-4 py-3 text-right">Preço-Alvo (R$)</th>
+                                    <th class="px-4 py-3">Recomendação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-4 py-3 font-medium">BTG Pactual</td>
+                                    <td class="px-4 py-3 text-right font-semibold">18.00</td>
+                                    <td class="px-4 py-3"><span class="score-badge px-2 py-1 text-xs font-bold rounded-full">Compra</span></td>
+                                </tr>
+                                 <tr class="border-b">
+                                    <td class="px-4 py-3 font-medium">Fintel (Média)</td>
+                                    <td class="px-4 py-3 text-right font-semibold">15.30</td>
+                                    <td class="px-4 py-3"><span class="score-badge px-2 py-1 text-xs font-bold rounded-full">Compra</span></td>
+                                </tr>
+                                 <tr class="border-b">
+                                    <td class="px-4 py-3 font-medium">Simply Wall St</td>
+                                    <td class="px-4 py-3 text-right font-semibold">14.95</td>
+                                    <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-bold rounded-full">Subvalorizada</span></td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-3 font-medium">Investing.com (Média)</td>
+                                    <td class="px-4 py-3 text-right font-semibold">14.82</td>
+                                    <td class="px-4 py-3"><span class="score-badge px-2 py-1 text-xs font-bold rounded-full">Compra</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-medium">Santander</td>
+                                    <td class="px-4 py-3 text-right font-semibold">N/A</td>
+                                    <td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs font-bold rounded-full">Neutra</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto p-6 text-center">
+            <p>&copy; 2025 Análise Interativa FLRY3. Gerado com base em dados públicos.</p>
+            <p class="text-xs text-gray-400 mt-2">Este relatório é apenas para fins informativos e não constitui uma recomendação de investimento.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const indicatorData = {
+                valuation: [
+                    { 'Indicador': 'D.Y', 'Valor': '7.99%', 'Pontuação': '5' },
+                    { 'Indicador': 'P/L', 'Valor': '11.11', 'Pontuação': '4' },
+                    { 'Indicador': 'PEG Ratio', 'Valor': '0.43', 'Pontuação': '5' },
+                    { 'Indicador': 'P/VP', 'Valor': '1.33', 'Pontuação': '5' },
+                    { 'Indicador': 'EV/EBITDA', 'Valor': '4.97', 'Pontuação': '5' },
+                    { 'Indicador': 'P/Ativo Circ. Liq.', 'Valor': '-0.81', 'Pontuação': '1' }
+                ],
+                endividamento: [
+                    { 'Indicador': 'Dív. Líquida/PL', 'Valor': '0.58', 'Pontuação': '4' },
+                    { 'Indicador': 'Dív. Líquida/EBITDA', 'Valor': '1.51', 'Pontuação': '5' },
+                    { 'Indicador': 'Dív. Líquida/EBIT', 'Valor': '2.52', 'Pontuação': '5' },
+                    { 'Indicador': 'Passivos/Ativos', 'Valor': '0.60', 'Pontuação': '5' },
+                    { 'Indicador': 'Liq. Corrente', 'Valor': '2.29', 'Pontuação': '5' }
+                ],
+                eficiencia: [
+                    { 'Indicador': 'Margem Bruta', 'Valor': '27.58%', 'Pontuação': '5' },
+                    { 'Indicador': 'Margem EBITDA', 'Valor': '25.82%', 'Pontuação': '5' },
+                    { 'Indicador': 'Margem EBIT', 'Valor': '15.44%', 'Pontuação': '5' },
+                    { 'Indicador': 'Margem Líquida', 'Valor': '8.05%', 'Pontuação': '5' }
+                ],
+                rentabilidade: [
+                    { 'Indicador': 'ROE', 'Valor': '12.01%', 'Pontuação': '4' },
+                    { 'Indicador': 'ROA', 'Valor': '4.73%', 'Pontuação': '4' },
+                    { 'Indicador': 'ROIC', 'Valor': '9.39%', 'Pontuação': '4' },
+                    { 'Indicador': 'Giro Ativos', 'Valor': '0.59', 'Pontuação': '4' }
+                ],
+                crescimento: [
+                    { 'Indicador': 'CAGR Receitas 5 anos', 'Valor': '21.48%', 'Pontuação': '5' },
+                    { 'Indicador': 'CAGR Lucros 5 anos', 'Valor': '14.98%', 'Pontuação': '4' }
+                ]
+            };
+            
+            const comparisonData = {
+                'P/L': {
+                    data: [11.11, -1.79, -40.80, 21.13],
+                    analysis: "A FLRY3 (11.11) tem uma avaliação P/L muito mais atrativa que a RDOR3 (21.13) e se destaca frente a DASA3 e HAPV3, que apresentam prejuízo."
+                },
+                'EV/EBITDA': {
+                    data: [4.97, 4.38, 10.63, 8.72],
+                    analysis: "O EV/EBITDA da FLRY3 (4.97) é eficiente, próximo ao da DASA3 e bem inferior aos múltiplos mais elevados de HAPV3 e RDOR3."
+                },
+                'Margem Líquida': {
+                    data: [8.05, -7.38, -1.82, 7.95],
+                    analysis: "A margem líquida da FLRY3 (8.05%) é robusta e comparável à da RDOR3, superando com folga DASA3 e HAPV3, que operam com margens negativas."
+                },
+                'ROE': {
+                    data: [12.01, -14.55, -1.08, 16.33],
+                    analysis: "O ROE da FLRY3 (12.01%) é positivo e saudável, indicando bom retorno aos acionistas, especialmente em contraste com os retornos negativos de DASA3 e HAPV3."
+                },
+                'Dívida Líquida/EBITDA': {
+                    data: [1.51, 3.58, 1.55, -0.22],
+                    analysis: "A alavancagem da FLRY3 (1.51) é saudável e gerenciável, muito melhor que a da DASA3 (3.58) e similar à da HAPV3. RDOR3 se destaca com posição de caixa líquido."
+                },
+            };
+
+            function renderIndicatorTable(category) {
+                const data = indicatorData[category];
+                const container = document.getElementById('indicatorContent');
+                let tableHTML = `
+                    <table class="w-full text-sm text-left text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Indicador</th>
+                                <th scope="col" class="px-6 py-3 text-right">Valor Atual</th>
+                                <th scope="col" class="px-6 py-3 text-right">Pontuação (1-5)</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                data.forEach(item => {
+                    tableHTML += `
+                            <tr class="bg-white border-b">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">${item['Indicador']}</th>
+                                <td class="px-6 py-4 text-right">${item['Valor']}</td>
+                                <td class="px-6 py-4 text-right font-bold">${item['Pontuação']}</td>
+                            </tr>`;
+                });
+                tableHTML += `</tbody></table>`;
+                container.innerHTML = tableHTML;
+            }
+
+            const indicatorTabs = document.getElementById('indicatorTabs');
+            indicatorTabs.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    indicatorTabs.querySelector('.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    renderIndicatorTable(e.target.dataset.tab);
+                }
+            });
+            
+            renderIndicatorTable('valuation');
+
+            const radarCtx = document.getElementById('indicatorRadarChart').getContext('2d');
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Valuation', 'Endividamento', 'Eficiência', 'Rentabilidade', 'Crescimento'],
+                    datasets: [{
+                        label: 'Pontuação Média da FLRY3',
+                        data: [4.2, 4.6, 5.0, 4.0, 4.5],
+                        fill: true,
+                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                        borderColor: 'rgb(13, 148, 136)',
+                        pointBackgroundColor: 'rgb(13, 148, 136)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(13, 148, 136)'
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                color: '#404040'
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: 5,
+                                stepSize: 1,
+                                backdropColor: 'rgba(0,0,0,0)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                           display: false
+                        }
+                    }
+                }
+            });
+            
+            let comparisonChart;
+            const comparisonChartCtx = document.getElementById('comparisonChart').getContext('2d');
+            const analysisContainer = document.getElementById('comparisonAnalysis');
+            
+            function renderComparisonChart(metric) {
+                const data = comparisonData[metric];
+                analysisContainer.textContent = data.analysis;
+                
+                if (comparisonChart) {
+                    comparisonChart.destroy();
+                }
+
+                comparisonChart = new Chart(comparisonChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['FLRY3', 'DASA3', 'HAPV3', 'RDOR3'],
+                        datasets: [{
+                            label: metric,
+                            data: data.data,
+                            backgroundColor: [
+                                'rgba(13, 148, 136, 0.8)',
+                                'rgba(107, 114, 128, 0.6)',
+                                'rgba(107, 114, 128, 0.6)',
+                                'rgba(107, 114, 128, 0.6)',
+                            ],
+                            borderColor: [
+                                'rgb(13, 148, 136)',
+                                'rgb(107, 114, 128)',
+                                'rgb(107, 114, 128)',
+                                'rgb(107, 114, 128)',
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { display: false }
+                            },
+                             x: {
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x.toFixed(2);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const comparisonButtons = document.getElementById('comparisonButtons');
+            comparisonButtons.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    comparisonButtons.querySelectorAll('button').forEach(btn => {
+                        btn.classList.remove('bg-teal-500', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-700');
+                    });
+                    e.target.classList.add('bg-teal-500', 'text-white');
+                    e.target.classList.remove('bg-gray-200', 'text-gray-700');
+                    renderComparisonChart(e.target.dataset.metric);
+                }
+            });
+
+            renderComparisonChart('P/L');
+
+            const recommendationsCtx = document.getElementById('recommendationsChart').getContext('2d');
+            new Chart(recommendationsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Compra Forte', 'Compra', 'Manter', 'Venda'],
+                    datasets: [{
+                        label: 'Recomendações',
+                        data: [3, 8, 6, 1],
+                        backgroundColor: [
+                            '#047857',
+                            '#0d9488',
+                            '#facc15',
+                            '#dc2626'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+
+            const riskAccordion = document.getElementById('riskAccordion');
+            riskAccordion.addEventListener('click', function(e) {
+                const header = e.target.closest('.risk-accordion-header');
+                if (!header) return;
+
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('span');
+                
+                content.classList.toggle('open');
+                icon.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
